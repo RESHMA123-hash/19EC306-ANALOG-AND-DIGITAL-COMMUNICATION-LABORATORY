@@ -1,94 +1,73 @@
 # AIM:
-To implement Shannon Fano coding schemes using MATLAB.
+To implement error control coding schemes with linear block codes using MATLAB.
 
-# SOFTWARE REQUIRED:
-MATLAB
+# SOFTWARE REQUIRED: 
+  MATLAB
 
 # PROGRAM:
-# SHANNON FANO :
+# ERROR CODING
+# ENCODING:
 clc;
-clear all;
+
 close all;
 
-m = input('Enter the no. of message ensembles : ');
-z = [];
-h = 0;
-l = 0;
+n = 7;
 
-display('Enter the probabilities in descending order');
+k = 4;
 
-for i = 1:m
-    fprintf('Ensemble %d\n', i);
-    p(i) = input('');
-end
+msg = [1 0 0 1;
+       1 0 1 0;
+       1 0 1 1];
+       
+code = encode(msg, n, k, 'cyclic');
 
-a(1) = 0;
+msg
 
-for j = 2:m
-    a(j) = a(j-1) + p(j-1);
-end
+code
 
-fprintf('\n Alpha Matrix');
-display(a);
+# ENCODING OUTPUT:
+<img width="473" height="322" alt="image" src="https://github.com/user-attachments/assets/571bb5be-3842-4bed-b021-54a948745bd4" />
 
-for i = 1:m
-    n(i) = ceil(-1 * (log2(p(i))));
-end
 
-fprintf('\n Code length matrix');
-display(n);
+# DECODING PROGRAM:
+clc;
 
-for i = 1:m
-    int = a(i);
+clear all;
 
-    for j = 1:n(i)
-        frac = int * 2;
-        c = floor(frac);
-        frac = frac - c;
-        z = [z c];
-        int = frac;
-    end
+close all;
 
-    fprintf('Codeword %d : ', i);
-    disp(z);
-    z = [];
-end
+q = 3;
 
-fprintf('Avg. Code Length : ');
+n = 2^q - 1;
 
-for i = 1:m
-    x = p(i) * n(i);
-    l = l + x;
+k = n - q;
 
-    x = p(i) * log2(1 / p(i));
-    h = h + x;
-end
+parmat = hammgen(q);
 
-display(l);
+trt = syndtable(parmat);
 
-fprintf('Entropy : ');
-display(h);
+recd = [1 0 1 1 1 1 0];
 
-fprintf('Efficiency : ');
-display(100 * h / l);
+syndrome = rem(recd * parmat', 2);
 
-fprintf('Redundancy : ');
-display(100 - (100 * h / l));
+syndrome_de = bi2de(syndrome, 'left-msb');
 
-# Input:
-Enter the Number of message ensembles: 4
-Enter the probabilities in ascending order Ensemble 1
-0.2
-Ensemble 2
-0.3
-Ensemble 4
-0.4
-Ensemble 5
-0.4
+disp(['syndrome = ', num2str(syndrome_de), ' (decimal) ', ...
+      num2str(syndrome), ' (binary)']);
 
-# OUTPUT:
+corrvect = trt(1 + syndrome_de, :);
+
+correctedcode = rem(corrvect + recd, 2);
+
+parmat
+
+corrvect
+
+correctedcode
+
+# DECODING OUTPUT:
+<img width="415" height="267" alt="image" src="https://github.com/user-attachments/assets/4bdf9c3c-b276-49f9-a531-421f214b671b" />
 
 
 # RESULT:
-Thus Shannon Fano coding are performed using MATLAB.
-
+Thus encoding and decoding of block codes are performed using MATLAB.
